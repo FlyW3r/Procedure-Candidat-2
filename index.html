@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen — Procédure</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#15120f;
+
+  --surface:#211b16;
+  --surface2:#2b231d;
+  --surface3:#362c24;
+
+  --border:rgba(255,255,255,.08);
+  --border2:rgba(255,255,255,.15);
+
+  --accent:#9b7653;
+  --accent2:#7e603f;
+
+  --gold:#d2b48c;
+  --gold2:#b89568;
+
+  --text:#f5f1eb;
+  --muted:#a49483;
+
+  --danger:#d86a5f;
+  --success:#68b88a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;line-height:1.6}
+.noise{position:fixed;inset:0;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");z-index:0}
+.container{max-width:720px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1}
+.exam-header{text-align:center;padding:3rem 0 2.5rem}
+.rank-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border2);border-radius:100px;padding:6px 16px;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:1.5rem}
+.rank-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);display:block}
+.exam-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:1rem}
+.exam-title span{color:var(--accent)}
+.exam-meta{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-top:1.5rem}
+.meta-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.meta-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:.6}
+.rules{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2.5rem;font-size:13.5px;color:var(--muted);line-height:1.8}
+.rules strong{color:var(--text)}
+.timer-bar{position:sticky;top:0;z-index:100;background:rgba(155,118,83);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.timer-label{font-size:12px;color:var(--muted);font-family:'Syne',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.timer-count{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--text);transition:color .3s}
+.timer-count.warn{color:var(--gold)}
+.timer-count.danger{color:var(--danger)}
+.progress-track{flex:1;height:3px;background:var(--border2);margin:0 1.5rem;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .5s}
+.section-header{display:flex;align-items:center;gap:12px;margin:2rem 0 1rem}
+.section-num{width:28px;height:28px;border-radius:6px;background:var(--accent);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-title{font-family:'Syne',sans-serif;font-weight:600;font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1rem;transition:border-color .2s}
+.q-card:focus-within{border-color:var(--border2)}
+.q-num{font-size:11px;font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+.q-points{float:right;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--muted);font-family:'Syne',sans-serif}
+.q-text{font-size:15px;font-weight:500;color:var(--text);margin-bottom:1.25rem;line-height:1.6}
+.q-img{width:100%;max-height:280px;object-fit:contain;border-radius:10px;margin-bottom:1rem;border:1px solid var(--border)}
+textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;min-height:100px;line-height:1.6;transition:border-color .2s;outline:none}
+textarea:focus{border-color:var(--accent)}
+textarea::placeholder{color:var(--muted)}
+input[type=text]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s;outline:none}
+input[type=text]:focus{border-color:var(--accent)}
+input[type=text]::placeholder{color:var(--muted)}
+.options{display:flex;flex-direction:column;gap:8px;margin-top:.25rem}
+.option-label{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .2s;font-size:14px}
+.option-label:hover{border-color:var(--border2)}
+.option-label input{margin-top:2px;accent-color:var(--accent);flex-shrink:0}
+.option-label.selected{border-color:var(--accent);background:rgba(123,110,246,.08)}
+.submit-wrap{padding:2rem 0 3rem;text-align:center}
+.submit-btn{background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;letter-spacing:.04em;padding:14px 40px;border:none;border-radius:12px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:10px}
+.submit-btn:hover{background:var(--accent2);transform:translateY(-1px)}
+.submit-btn:active{transform:translateY(0)}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.success-screen{display:none;text-align:center;padding:4rem 0}
+.success-icon{width:80px;height:80px;border-radius:50%;background:rgba(155,118,83.15);border:2px solid var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:36px}
+.success-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:.75rem}
+.success-sub{color:var(--muted);font-size:15px;max-width:380px;margin:0 auto}
+.overdue-screen{display:none;text-align:center;padding:4rem 0}
+.overdue-icon{width:80px;height:80px;border-radius:50%;background:rgba(155,118,83.12);border:2px solid var(--danger);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:36px}
+.required-star{color:var(--danger);margin-left:3px}
+.field-label{font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.no-questions{text-align:center;padding:3rem 0;color:var(--muted);font-size:14px}
+@media(max-width:500px){.exam-meta{gap:1rem}}
+</style>
+<!-- Firebase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL =
+'https://hxbjgktsrrpiwvuvzkto.supabase.co';
+
+const SUPABASE_KEY =
+'sb_publishable_Spl5ZvM77mhN4ShrsVuGtQ_Mhx65HPx';
+
+const supabase =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+window.storage = {
+
+  async getConfig() {
+    const { data } = await supabase
+      .from('exam_config')
+      .select('*')
+      .limit(1)
+      .single();
+
+    return data;
+  },
+
+  async getQuestions() {
+    const { data } = await supabase
+      .from('questions')
+      .select('*');
+
+    return data || [];
+  },
+
+  async addSubmission(submission) {
+    return await supabase
+      .from('submissions')
+      .insert(submission);
+  }
+
+};
+
+window.dispatchEvent(new Event('firebaseReady'));
+</script>
+</head>
+<body>
+<div class="noise"></div>
+
+<div class="timer-bar" id="timerBar" style="display:none">
+  <span class="timer-label">Temps restant</span>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:100%"></div></div>
+  <span class="timer-count" id="timerCount">25:00</span>
+</div>
+
+<div class="container">
+
+  <div class="overdue-screen" id="overdueScreen">
+    <div class="overdue-icon">⏱</div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:.75rem">Temps écoulé</h2>
+    <p style="color:var(--muted);font-size:15px">Vous avez dépassé le temps limite.<br>Votre examen a été automatiquement soumis.</p>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <h2 class="success-title">Copie envoyée !</h2>
+    <p class="success-sub">Votre examen a bien été transmis aux formateurs. Vous pouvez fermer cette page.</p>
+  </div>
+
+  <div id="examContent">
+    <div class="exam-header">
+      <div class="rank-badge" id="headerBadge">Formation Procédure</div>
+      <h1 class="exam-title" id="headerTitle">Examen<br><span id="headerTitleSpan">Procédure</span></h1>
+      <div class="exam-meta">
+        <div class="meta-item"><span class="meta-dot"></span><span id="metaDuration">25 minutes</span></div>
+        <div class="meta-item"><span class="meta-dot"></span><span id="metaPass">Seuil de réussite : 17/20</span></div>
+        <div class="meta-item"><span class="meta-dot"></span>Aucune aide autorisée</div>
+      </div>
+    </div>
+
+    <div class="rules" id="rulesBlock">
+      <strong>Règles :</strong> Ne pas renseigner de fausses informations · Bien indiquer la date du jour · Toute forme de triche entraîne une convocation CS + BL.<br>
+      Le(s) formateur(s) présent(s) ne vous aideront pas. <strong>AUCUNE QUESTION PENDANT L'EXAMEN.</strong><br>
+      <strong id="signatureBlock">408 | Alexander Adkins — Lead FTO Procédure & 428 | Martin Dacosta — Co-Lead FTO Procédure</strong>
+    </div>
+
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Informations candidat</div>
+    </div>
+
+    <div class="q-card">
+      <div class="field-label">Matricule | Prénom Nom<span class="required-star">*</span></div>
+      <input type="text" id="candidat" placeholder="Ex : 042 | Jean Dupont" oninput="window._savedCandidат=this.value.trim()" />
+    </div>
+    <div class="q-card">
+      <div class="field-label">Date de l'examen<span class="required-star">*</span></div>
+      <input type="text" id="dateExam" placeholder="Ex : 21/05/2026" oninput="window._savedDate=this.value.trim()" />
+    </div>
+
+    <div id="questionsWrap"></div>
+
+    <div class="submit-wrap">
+      <button class="submit-btn" id="submitBtn" onclick="submitExam()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+        Soumettre ma copie
+      </button>
+      <p style="font-size:12px;color:var(--muted);margin-top:1rem">Vérifiez bien vos réponses avant d'envoyer.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let DURATION = 25 * 60;
+let timeLeft = DURATION;
+let timerInterval;
+let submitted = false;
+
+async function loadConfig() {
+  try {
+    const r = await window.storage.get('proc2_config');
+    if (r && r.value) {
+      const cfg = JSON.parse(r.value);
+      if (cfg.duration) { DURATION = cfg.duration * 60; timeLeft = DURATION; }
+      if (cfg.pass && cfg.title) {
+        document.getElementById('metaPass').textContent = 'Seuil de réussite : ' + cfg.pass + '/20';
+      }
+      if (cfg.duration) document.getElementById('metaDuration').textContent = cfg.duration + ' minutes';
+      if (cfg.signature) document.getElementById('signatureBlock').textContent = cfg.signature;
+      if (cfg.rules) {
+        const rb = document.getElementById('rulesBlock');
+        rb.innerHTML = '<strong>Règles :</strong> ' + cfg.rules + '<br><strong id="signatureBlock">' + (cfg.signature || '') + '</strong>';
+      }
+      if (cfg.title) document.getElementById('headerTitleSpan').textContent = cfg.title;
+    }
+  } catch(e) {}
+}
+
+async function loadQuestions() {
+  try {
+    const r = await window.storage.get('proc2_questions');
+    if (r && r.value) return JSON.parse(r.value);
+  } catch(e) {}
+  return [];
+}
+
+async function init() {
+  await loadConfig();
+  const questions = await loadQuestions();
+  renderQuestions(questions);
+  startTimer();
+  document.getElementById('timerBar').style.display = 'flex';
+  const m = Math.floor(DURATION / 60);
+  document.getElementById('timerCount').textContent = String(m).padStart(2,'0') + ':00';
+}
+
+function renderQuestions(questions) {
+  const wrap = document.getElementById('questionsWrap');
+  if (!questions.length) {
+    wrap.innerHTML = '<div class="no-questions">Aucune question disponible pour le moment.</div>';
+    wrap._questions = [];
+    return;
+  }
+  let lastSection = '', sectionNum = 1, html = '';
+  questions.forEach((q, i) => {
+    if (q.section !== lastSection) {
+      sectionNum++;
+      html += `<div class="section-header"><div class="section-num">${sectionNum}</div><div class="section-title">${q.section}</div></div>`;
+      lastSection = q.section;
+    }
+    let input = '';
+    if (q.type === 'open') {
+      input = `<textarea id="${q.id}" placeholder="Votre réponse..." rows="4"></textarea>`;
+    } else if (q.type === 'mcq') {
+      input = `<div class="options">${q.options.map((opt,oi) =>
+        `<label class="option-label" id="lbl_${q.id}_${oi}">
+          <input type="radio" name="${q.id}" value="${oi}" onchange="updateOptionStyle(this,'${q.id}')"> ${opt}
+        </label>`).join('')}</div>`;
+    } else if (q.type === 'mcq_multi') {
+      input = `<div class="options">${q.options.map((opt,oi) =>
+        `<label class="option-label" id="lbl_${q.id}_${oi}">
+          <input type="checkbox" name="${q.id}" value="${oi}" onchange="updateOptionStyle(this,'${q.id}')"> ${opt}
+        </label>`).join('')}</div>`;
+    }
+    html += `<div class="q-card">
+      <div class="q-num">Question ${i+1} <span class="q-points">${q.points} pt${q.points>1?'s':''}</span></div>
+      <div class="q-text">${q.text.replace(/\n/g,'<br>')}</div>
+      ${q.image?`<img src="${q.image}" class="q-img" alt="image question">`:''}
+      ${input}
+    </div>`;
+  });
+  wrap.innerHTML = html;
+  wrap._questions = questions;
+}
+
+function updateOptionStyle(input, qid) {
+  document.querySelectorAll(`[id^="lbl_${qid}_"]`).forEach(lbl => lbl.classList.remove('selected'));
+  if (input.type === 'radio') {
+    if (input.checked) document.getElementById(`lbl_${qid}_${input.value}`).classList.add('selected');
+  } else {
+    document.querySelectorAll(`input[name="${input.name}"]:checked`).forEach(cb => {
+      document.getElementById(`lbl_${qid}_${cb.value}`).classList.add('selected');
+    });
+  }
+}
+
+function startTimer() {
+  const fill = document.getElementById('progressFill');
+  const count = document.getElementById('timerCount');
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+    count.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    fill.style.width = (timeLeft / DURATION * 100) + '%';
+    if (timeLeft <= 300) count.className = 'timer-count warn';
+    if (timeLeft <= 60) count.className = 'timer-count danger';
+    if (timeLeft <= 0) { clearInterval(timerInterval); submitExam(true); }
+  }, 1000);
+}
+
+async function submitExam(auto = false) {
+  if (submitted) return;
+  const candidat = document.getElementById('candidat').value.trim();
+  const dateExam = document.getElementById('dateExam').value.trim();
+  if (!auto && (!candidat || !dateExam)) {
+    alert('Merci de renseigner votre matricule et la date de l\'examen.');
+    return;
+  }
+
+  // En mode auto (temps écoulé), on vérifie quand même qu'on a les infos minimales
+  // Si le candidat n'a pas rempli son matricule, on utilise ce qu'on a en mémoire
+  const finalCandidат = candidat || window._savedCandidат || 'Non renseigné';
+  const finalDate = dateExam || window._savedDate || 'Non renseignée';
+
+  submitted = true;
+  clearInterval(timerInterval);
+  const btn = document.getElementById('submitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi en cours…'; }
+
+  const questions = document.getElementById('questionsWrap')._questions || [];
+  const answers = {};
+  questions.forEach(q => {
+    if (q.type === 'open') {
+      answers[q.id] = document.getElementById(q.id)?.value || '';
+    } else if (q.type === 'mcq') {
+      const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+      answers[q.id] = checked ? parseInt(checked.value) : null;
+    } else if (q.type === 'mcq_multi') {
+      answers[q.id] = [...document.querySelectorAll(`input[name="${q.id}"]:checked`)].map(c => parseInt(c.value));
+    }
+  });
+
+  const submissionId = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  const submission = {
+    id: submissionId,
+    candidat: finalCandidат,
+    dateExam: finalDate,
+    answers,
+    submittedAt: new Date().toLocaleString('fr-FR'),
+    late: auto,
+    status: 'pending',
+    scores: {}
+  };
+
+  // Retry jusqu'à 4 tentatives avec délai croissant
+  let saved = false;
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    try {
+      await window.storage.set('proc2_sub_' + submissionId, JSON.stringify(submission));
+      saved = true;
+      break;
+    } catch(e) {
+      console.error('Tentative ' + attempt + ' échouée:', e);
+      if (attempt < 4) {
+        if (btn) btn.textContent = '⏳ Nouvelle tentative (' + attempt + '/4)…';
+        await new Promise(res => setTimeout(res, 1500 * attempt));
+      }
+    }
+  }
+
+  if (!saved) {
+    submitted = false;
+    if (btn) { btn.disabled = false; btn.textContent = '📤 Soumettre ma copie'; }
+    alert('⚠️ Impossible d\'envoyer ta copie après plusieurs tentatives. Vérifie ta connexion internet et réessaie. Si le problème persiste, contacte le formateur.');
+    return;
+  }
+
+  document.getElementById('examContent').style.display = 'none';
+  document.getElementById('timerBar').style.display = 'none';
+  if (auto) {
+    document.getElementById('overdueScreen').style.display = 'block';
+  } else {
+    document.getElementById('successScreen').style.display = 'block';
+  }
+}
+
+if (window._firebaseReady) {
+  init();
+} else {
+  window.addEventListener('firebaseReady', () => init());
+}
+</script>
+</body>
+</html>
